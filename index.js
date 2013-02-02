@@ -1,17 +1,21 @@
-var conf_dir = 'etc'
+var conf_dir = process.env.conf_dir || 'etc'
 
-var informer_socket = 'run/tincd.sock'
-var http_port = 1027
+var informer_socket = process.env.informer_socket || 'run/tincd.sock'
+var http_port = process.env.http_port || 1027
 
 var daemon_options = {
-  command: 'sbin/tincd',
-  args: [ '--config=etc' , '--pidfile=run/pid' , '-D' ],
+  command: process.env.tincd_path || 'sbin/tincd',
+  args: [ '-D'
+    , '--config=' + conf_dir
+    , '--pidfile=' + (process.env.pid_file || 'run/pid')
+  ],
   env: {},
 }
 
 
 var log = require('./log')
 var tinc = require('./tinc')
+
 var config = new tinc.Config()
 var daemon = new tinc.Daemon()
 var server = new tinc.Server()
