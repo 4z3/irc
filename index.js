@@ -76,7 +76,7 @@ server.on('host-down', function (hostname, remoteAddress, remotePort) {
     log.unhandled([ 'subnet-up', hostname, subnet].join(' '))
   })
   server.on('subnet-down', function (hostname, remoteAddress, remotePort, subnet) {
-    log.unhandled([ 'subnet-up', hostname, subnet].join(' '))
+    log.unhandled([ 'subnet-down', hostname, subnet].join(' '))
   })
   server.on('error', function (err) {
     log.error('server: ' + err)
