@@ -9,8 +9,17 @@ var tinc = require('./tinc')
 var config = new tinc.Config()
 var server = new tinc.Server()
 
-server.listen(informer_socket)
 config.watch(conf_dir)
+server.listen(informer_socket)
+
+config.on('error', function (err) {
+  log.error('config: ' + err.message)
+  process.exit(1)
+})
+server.on('error', function (err) {
+  log.error('server: ' + err.message)
+  process.exit(1)
+})
 
 process.on('exit', function (code, signal) {
   log.info('Terminating')
@@ -67,9 +76,6 @@ server.on('host-down', function (hostname, remoteAddress, remotePort) {
   config.on('host-unload', function (hostname) {
     log.unhandled([ 'host-unload', hostname].join(' '))
   })
-  config.on('error', function (err) {
-    log.error('config: ' + err)
-  })
 
 
   server.on('listening', function (uri) {
@@ -86,9 +92,6 @@ server.on('host-down', function (hostname, remoteAddress, remotePort) {
   })
   server.on('subnet-down', function (hostname, remoteAddress, remotePort, subnet) {
     log.unhandled([ 'subnet-down', hostname, subnet].join(' '))
-  })
-  server.on('error', function (err) {
-    log.error('server: ' + err)
   })
   server.on('stopped', function () {
     log.info('server stopped')
