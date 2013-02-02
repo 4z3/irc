@@ -13,73 +13,21 @@ var daemon_options = {
 }
 
 
+var state = { hosts: {} }
+
+var inspect = require('util').inspect
 var log = require('./log')
 var tinc = require('./tinc')
 
+
 var config = new tinc.Config()
-var daemon = new tinc.Daemon()
-var server = new tinc.Server()
 
 config.watch(conf_dir)
-daemon.start(daemon_options)
-server.listen(informer_socket)
 
 config.on('error', function (err) {
   log.error('config: ' + err.message)
   process.exit(1)
 })
-daemon.on('error', function (err) {
-  log.error('daemon: ' + err.message)
-  process.exit(1)
-})
-server.on('error', function (err) {
-  log.error('server: ' + err.message)
-  process.exit(1)
-})
-
-process.on('exit', function (code, signal) {
-  log.info('Terminating')
-  daemon.stop()
-  server.stop()
-})
-
-process.on('SIGINT', function () {
-  log.info('Got INT signal')
-  process.exit(0)
-})
-
-var state = { hosts: {} }
-
-config.on('host-load', function (hostname, config) {
-  if (!state.hosts[hostname]) {
-    state.hosts[hostname] = { addresses: {} }
-  }
-  var host = state.hosts[hostname]
-
-  host.config = config
-})
-server.on('host-up', function (hostname, remoteAddress, remotePort) {
-  if (!state.hosts[hostname]) {
-    state.hosts[hostname] = { addresses: {} }
-  }
-  var host = state.hosts[hostname]
-
-  host.addresses[remoteAddress] = remotePort
-  host.status = 'online'
-})
-server.on('host-down', function (hostname, remoteAddress, remotePort) {
-  if (!state.hosts[hostname]) {
-    state.hosts[hostname] = { addresses: {} }
-  }
-  var host = state.hosts[hostname]
-
-  host.addresses[remoteAddress] = remotePort
-  host.status = 'offline'
-})
-
-;(function () {
-  var inspect = require('util').inspect
-
 
   config.on('watching', function (uri) {
     log.info('watching ' + uri)
@@ -94,6 +42,27 @@ server.on('host-down', function (hostname, remoteAddress, remotePort) {
     log.unhandled([ 'host-unload', hostname].join(' '))
   })
 
+config.on('host-load', function (hostname, config) {
+  if (!state.hosts[hostname]) {
+    state.hosts[hostname] = { addresses: {} }
+  }
+  var host = state.hosts[hostname]
+
+  host.config = config
+})
+
+var daemon = new tinc.Daemon()
+
+daemon.start(daemon_options)
+
+daemon.on('error', function (err) {
+  log.error('daemon: ' + err.message)
+  process.exit(1)
+})
+
+process.on('exit', function (code, signal) {
+  daemon.stop()
+})
 
   daemon.on('ready', function () {
     log.info('daemon ready')
@@ -113,7 +82,19 @@ server.on('host-down', function (hostname, remoteAddress, remotePort) {
   daemon.on('stopped', function () {
     log.info('daemon stopped')
   })
+
+var server = new tinc.Server()
 
+server.listen(informer_socket)
+
+server.on('error', function (err) {
+  log.error('server: ' + err.message)
+  process.exit(1)
+})
+
+process.on('exit', function (code, signal) {
+  server.stop()
+})
 
   server.on('listening', function (uri) {
     log.info('listening ' + uri)
@@ -134,5 +115,31 @@ server.on('host-down', function (hostname, remoteAddress, remotePort) {
     log.info('server stopped')
   })
 
+server.on('host-up', function (hostname, remoteAddress, remotePort) {
+  if (!state.hosts[hostname]) {
+    state.hosts[hostname] = { addresses: {} }
+  }
+  var host = state.hosts[hostname]
 
-})()
+  host.addresses[remoteAddress] = remotePort
+  host.status = 'online'
+})
+server.on('host-down', function (hostname, remoteAddress, remotePort) {
+  if (!state.hosts[hostname]) {
+    state.hosts[hostname] = { addresses: {} }
+  }
+  var host = state.hosts[hostname]
+
+  host.addresses[remoteAddress] = remotePort
+  host.status = 'offline'
+})
+
+
+process.on('exit', function (code, signal) {
+  log.info('Terminating')
+})
+
+process.on('SIGINT', function () {
+  log.info('Got INT signal')
+  process.exit(0)
+})
