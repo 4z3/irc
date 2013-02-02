@@ -32,6 +32,7 @@
     Port = 1665
     ConnectTo = nomic
     EOF
+    sbin/tincd --config=etc --pidfile=run/pid --generate-keys
 
 ### link system's and retiolum's tincd configuration
 
