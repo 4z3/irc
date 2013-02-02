@@ -2,10 +2,12 @@ var util = require('util')
 var net = require('net')
 var url_parse = require('url').parse
 var EventEmitter = require('events').EventEmitter
+var fs = require('fs')
 
 function Server () {
   EventEmitter.call(this)
 
+  this._onstop = []
   this.config = {}
 }
 util.inherits(Server, EventEmitter)
@@ -25,6 +27,9 @@ Server.prototype.listen = function (uri, callback) {
     case 'unix:':
       config.server = new net.Server(listener)
       config.server.listen(url.pathname, function () {
+        self._onstop.push(function () {
+          fs.unlinkSync(url.pathname)
+        })
         self.emit('listening', uri)
       })
       break
@@ -70,6 +75,11 @@ Server.prototype.listen = function (uri, callback) {
       }
     })
   }
+}
+
+Server.prototype.stop = function () {
+  for (var stop; stop = this._onstop.pop(); stop())
+  this.emit('stopped')
 }
 
 //var event_unix_server = new net.Server(listener)

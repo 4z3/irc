@@ -81,6 +81,9 @@ server.on('host-down', function (hostname, remoteAddress, remotePort) {
   server.on('error', function (err) {
     log.error('server: ' + err)
   })
+  server.on('stopped', function () {
+    log.info('server stopped')
+  })
 
 
 })()
