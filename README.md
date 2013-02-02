@@ -48,3 +48,10 @@
 
     node $somewhere
 
+### install up/down scripts
+
+  this requires [socat](http://www.dest-unreach.org/socat/)
+
+    su - retiolum
+    ln -s $somewhere/informer etc/host-up
+    ln -s $somewhere/informer etc/host-down

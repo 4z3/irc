@@ -1,0 +1,15 @@
+#! /bin/dash
+{
+  echo -n '{' 
+  #[ x = "x${NETNAME-}"       ]||echo -n "\"NETNAME\":\"$NETNAME\","
+  #[ x = "x${NAME-}"          ]||echo -n "\"NAME\":\"$NAME\","
+  [ x = "x${NODE-}"          ]||echo -n "\"NODE\":\"$NODE\","
+  [ x = "x${REMOTEADDRESS-}" ]||echo -n "\"REMOTEADDRESS\":\"$REMOTEADDRESS\","
+  [ x = "x${REMOTEPORT-}"    ]||echo -n "\"REMOTEPORT\":$REMOTEPORT,"
+  [ x = "x${SUBNET-}"        ]||echo -n "\"SUBNET\":\"$SUBNET\","
+  [ x = "x${WEIGHT-}"        ]||echo -n "\"WEIGHT\":\"$WEIGHT\","
+  #[ x = "x${DEVICE-}"        ]||echo -n "\"DEVICE\":\"$DEVICE\","
+  #[ x = "x${INTERFACE-}"     ]||echo -n "\"INTERFACE\":\"$INTERFACE\","
+  echo -n "\"type\":\"${0##*/}\""
+  echo '}'
+} | socat STDIN UNIX-CONNECT:run/tincd.sock &
