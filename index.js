@@ -4,6 +4,7 @@ var informer_socket = '/run/retiolum/informer.sock'
 var http_port = 1027
 
 
+var log = require('./log')
 var tinc = require('./tinc')
 var config = new tinc.Config()
 var server = new tinc.Server()
@@ -11,6 +12,10 @@ var server = new tinc.Server()
 server.listen(informer_socket)
 config.watch(conf_dir)
 
+process.on('exit', function (code, signal) {
+  log.info('Terminating')
+  server.stop()
+})
 
 var state = { hosts: {} }
 
@@ -42,7 +47,6 @@ server.on('host-down', function (hostname, remoteAddress, remotePort) {
 })
 
 ;(function () {
-  var log = require('./log')
   var inspect = require('util').inspect
 
 
