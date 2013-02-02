@@ -1,19 +1,31 @@
-var conf_dir = '/etc/tinc/retiolum'
+var conf_dir = 'etc'
 
-var informer_socket = '/run/retiolum/informer.sock'
+var informer_socket = 'run/tincd.sock'
 var http_port = 1027
+
+var daemon_options = {
+  command: 'sbin/tincd',
+  args: [ '--config=etc' , '--pidfile=run/pid' , '-D' ],
+  env: {},
+}
 
 
 var log = require('./log')
 var tinc = require('./tinc')
 var config = new tinc.Config()
+var daemon = new tinc.Daemon()
 var server = new tinc.Server()
 
 config.watch(conf_dir)
+daemon.start(daemon_options)
 server.listen(informer_socket)
 
 config.on('error', function (err) {
   log.error('config: ' + err.message)
+  process.exit(1)
+})
+daemon.on('error', function (err) {
+  log.error('daemon: ' + err.message)
   process.exit(1)
 })
 server.on('error', function (err) {
@@ -23,6 +35,7 @@ server.on('error', function (err) {
 
 process.on('exit', function (code, signal) {
   log.info('Terminating')
+  daemon.stop()
   server.stop()
 })
 
@@ -75,6 +88,26 @@ server.on('host-down', function (hostname, remoteAddress, remotePort) {
   })
   config.on('host-unload', function (hostname) {
     log.unhandled([ 'host-unload', hostname].join(' '))
+  })
+
+
+  daemon.on('ready', function () {
+    log.info('daemon ready')
+  })
+  daemon.on('stdout-line', function (line) {
+    log.info('[33;1mtincd stdout: ' + line + '[m')
+  })
+  daemon.on('stderr-line', function (line) {
+    log.info('[33mtincd stderr: ' + line + '[m')
+  })
+  daemon.on('stderr-line', function ready_listener (line) {
+    if (line === 'Ready') {
+      daemon.removeListener('stderr-line', ready_listener)
+      daemon.emit('ready')
+    }
+  })
+  daemon.on('stopped', function () {
+    log.info('daemon stopped')
   })
 
 

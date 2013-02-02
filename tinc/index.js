@@ -1,4 +1,5 @@
 exports.Config = require('./config')
+exports.Daemon = require('./daemon')
 exports.Server = require('./server')
 
 //var util = require('util')
