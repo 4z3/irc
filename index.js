@@ -16,6 +16,11 @@ process.on('exit', function (code, signal) {
   log.info('Terminating')
   server.stop()
 })
+
+process.on('SIGINT', function () {
+  log.info('Got INT signal')
+  process.exit(0)
+})
 
 var state = { hosts: {} }
 
