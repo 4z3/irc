@@ -132,7 +132,7 @@ load_host_config = function (filename, callback) {
     data.push(chunk)
   })
   stream.on('end', function() {
-    var config = { addresses: {} }
+    var config = { addresses: {}, subnets: {} }
     var port
     Buffer
       .concat(data)
@@ -149,7 +149,8 @@ load_host_config = function (filename, callback) {
         switch (line[0]) {
           // Address = address [port]
           case 'Address':
-            // TODO assert line[1] and line[2]
+            // Note: we cannot set default port here, as Port doesn't have to
+            // be specified before Address in the host configuration.
             config.addresses[line[1]] = Number(line[2])
             break
           // Port = port (655)
@@ -157,9 +158,15 @@ load_host_config = function (filename, callback) {
             port = Number(line[1])
             break
           // Subnet = address[/prefixlength[#weight]]
-          //case 'Subnet':
-          //  set_subnet(hostname, line[1])
-          //  break
+          case 'Subnet':
+            line[1] = line[1].split('#')
+            var subnet = line[1][0]
+            var weight = Number(line[1][1])
+            if (isNaN(weight)) {
+              weight = 10
+            }
+            config.subnets[subnet] = weight
+            break
         }
       })
     // finalize
