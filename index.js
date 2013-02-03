@@ -42,8 +42,11 @@ if (typeof process.env.use === 'string') {
 }
 log.info('use: ' + inspect(use))
 
+if (use.daemon) var daemon = new tinc.Daemon()
+if (use.server) var server = new tinc.Server()
+if (use.config) var config = new tinc.Config()
+
 if (use.config) {
-  var config = new tinc.Config()
 
   config.watch(conf_dir)
 
@@ -76,9 +79,14 @@ if (use.config) {
 }
 
 if (use.daemon) {
-  var daemon = new tinc.Daemon()
 
-  daemon.start(daemon_options)
+  if (use.server) {
+    server.on('listening', function () {
+      daemon.start(daemon_options)
+    })
+  } else {
+    daemon.start(daemon_options)
+  }
 
   daemon.on('error', function (err) {
     log.error('daemon: ' + err.message)
@@ -110,7 +118,6 @@ if (use.daemon) {
 }
 
 if (use.server) {
-  var server = new tinc.Server()
 
   server.listen(informer_socket)
 
