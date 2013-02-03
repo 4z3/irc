@@ -145,6 +145,14 @@ if (use.server) {
   server.on('subnet-down', function (hostname, remoteAddress, remotePort, subnet) {
     log.unhandled([ 'subnet-down', hostname, subnet].join(' '))
   })
+  server.on('tinc-up', function (name, interface) {
+    log.unhandled([ 'tinc-up ' + interface
+      , inspect(state.hosts[name])
+    ].join(', '))
+  })
+  server.on('tinc-down', function (interface) {
+    log.unhandled('tinc-down ' + interface)
+  })
   server.on('stopped', function () {
     log.info('server stopped')
   })

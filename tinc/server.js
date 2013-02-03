@@ -70,6 +70,12 @@ Server.prototype.listen = function (uri, callback) {
           var remotePort = message.REMOTEPORT
           var subnet = message.SUBNET
           return self.emit(event, hostname, remoteAddress, remotePort, subnet)
+        case 'tinc-up':
+        case 'tinc-down':
+          var event = message.type
+          var name = message.NAME
+          var interface = message.INTERFACE
+          return self.emit(event, name, interface)
         default:
           //log_error('unix: ' + inspect(data))
       }
