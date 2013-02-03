@@ -12,8 +12,8 @@ exports.info = function (message) {
   log(message)
 }
 exports.error = function (message) {
-  log('[31m' + message + '[m')
+  log('[31m' + message.replace(/\[39m/g, '[31m') + '[m')
 }
 exports.unhandled = function (message) {
-  log('[30m' + message + '[m')
+  log('[30m' + message.replace(/\[39m/g, '[30m') + '[m')
 }
