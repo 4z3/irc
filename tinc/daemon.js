@@ -1,6 +1,7 @@
 var util = require('util')
 var EventEmitter = require('events').EventEmitter
 var spawn = require('child_process').spawn
+var make_data_to_lines = require('../events-utils').make_data_to_lines
 
 function Daemon () {
   EventEmitter.call(this)
@@ -28,20 +29,4 @@ Daemon.prototype.start = function (options) {
 Daemon.prototype.stop = function () {
   for (var stop; stop = this._onstop.pop(); stop())
   this.emit('stopped')
-}
-
-function make_data_to_lines (target, event_name) {
-  if (!event_name) event_name = 'line'
-
-  var buffer = ''
-
-  return function (data) {
-    var lines = (buffer + data).toString().split('\n')
-
-    buffer = lines.pop()
-
-    lines.forEach(function (line) {
-      target.emit(event_name, line)
-    })
-  }
 }
