@@ -15,7 +15,7 @@ var daemon_options = {
 
 var state = { hosts: {} }
 
-var inspect = require('util').inspect
+var inspect = function (x) { return require('util').inspect(x, null, 23, true) }
 var log = require('./log')
 var tinc = require('./tinc')
 
