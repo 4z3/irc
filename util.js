@@ -14,17 +14,17 @@ function log (message) {
   console.log('[34m' + head + '[m ' + message)
 }
 
-var reset_seq = /\[(39)?m/g
+var reset_seq = /\[(?:;?(?:39)?)m/g
 
 exports.log = {
   info: function (message) {
     log(message)
   },
   error: function (message) {
-    log('[31m' + message.replace(reset_seq, '[$1;31m') + '[m')
+    log('[31m' + message.replace(reset_seq, '[;31m') + '[m')
   },
   unhandled: function (message) {
-    log('[30m' + message.replace(reset_seq, '[$1;30m') + '[m')
+    log('[30m' + message.replace(reset_seq, '[;30m') + '[m')
   },
 }
 
