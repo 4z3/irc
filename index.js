@@ -42,7 +42,6 @@ if (typeof process.env.use === 'string') {
 }
 log.info('use: ' + inspect(use))
 
-if (use.daemon) var daemon = new tinc.Daemon()
 if (use.server) var server = new tinc.Server()
 if (use.config) var config = new tinc.Config()
 
@@ -78,46 +77,39 @@ if (use.config) {
   })
 }
 
+
+var EventEmitter = require('events').EventEmitter
+var events = new EventEmitter()
+
+state.config = {}
+state.config.tincd = daemon_options
+
+state.use = {}
+if (use.server) {
+  state.use.informer = true
+}
+
 if (use.daemon) {
 
-  if (use.server) {
-    server.on('listening', function () {
-      daemon.start(daemon_options)
-    })
-  } else {
-    daemon.start(daemon_options)
-  }
-
-  daemon.on('error', function (err) {
-    log.error('daemon: ' + err.message)
-    process.exit(1)
+  require('./parts/tincd').init(events, state)
+  events.on('tinc-ready', function () {
+    log.info('tincd ready')
+  })
+  events.on('tincd-stopped', function () {
+    log.info('tincd stopped')
   })
 
   process.on('exit', function (code, signal) {
-    daemon.stop()
+    events.emit('stop')
   })
 
-  daemon.on('ready', function () {
-    log.info('daemon ready')
-  })
-  daemon.on('stdout-line', function (line) {
-    log.info('[33;1mtincd stdout: ' + line + '[m')
-  })
-  daemon.on('stderr-line', function (line) {
-    log.info('[33mtincd stderr: ' + line + '[m')
-  })
-  daemon.on('stderr-line', function ready_listener (line) {
-    if (line === 'Ready') {
-      daemon.removeListener('stderr-line', ready_listener)
-      daemon.emit('ready')
-    }
-  })
-  daemon.on('stopped', function () {
-    log.info('daemon stopped')
-  })
 }
 
 if (use.server) {
+
+  server.on('listening', function () {
+    events.emit('informer-ready')
+  })
 
   server.listen(informer_socket)
 
@@ -146,8 +138,6 @@ if (use.server) {
     log.unhandled([ 'subnet-down', hostname, subnet].join(' '))
   })
 
-  var EventEmitter = require('events').EventEmitter
-  var events = new EventEmitter()
   require('./parts/ip-config').init(events, state)
   server.on('tinc-up', function (name, interface) {
     events.emit('tinc-up', name, interface)
