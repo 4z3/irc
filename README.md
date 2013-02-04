@@ -53,5 +53,6 @@
   this requires [socat](http://www.dest-unreach.org/socat/)
 
     su - retiolum
-    ln -s $somewhere/informer etc/host-up
-    ln -s $somewhere/informer etc/host-down
+    for script in {tinc,host,subnet}-{up,down}; do
+      ln -s $somewhere/informer $script
+    done
