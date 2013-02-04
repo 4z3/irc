@@ -69,25 +69,8 @@ process.on('SIGINT', function () {
   process.exit(0)
 })
 
-if (state.use.tinc_config) {
-
-  require('./parts/tinc_config').init(events, state)
-
-  require('./parts/prettyprint_host_config_events.js').init(events, state)
-}
-
-if (state.use.tincd) {
-  require('./parts/tincd').init(events, state)
-}
-
-if (state.use.informer) {
-
-  require('./parts/informer').init(events, state)
-
-  require('./parts/prettyprint_informer_events').init(events, state)
-
-  require('./parts/ip_setup').init(events, state)
-}
-
-// TODO watch out for dependencies!
-require('./parts/manage_host_state').init(events, state)
+Object.keys(state.use)
+  .filter(function (part) { return state.use[part] })
+  .forEach(function (part) {
+    require('./parts/' + part).init(events, state)
+  })
