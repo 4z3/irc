@@ -1,28 +1,31 @@
-var conf_dir = process.env.conf_dir || 'etc'
-
-var informer_socket = process.env.informer_socket || 'run/tincd.sock'
-var http_port = process.env.http_port || 1027
-
-var daemon_options = {
+var state = {
+  hosts: {},
+  config: {},
+  use: {
+    informer: true,
+    ip_setup: true,
+    tinc_config: true,
+    tincd: true,
+  },
+}
+state.config.informer = {
+  uri: process.env.informer_socket || 'run/tincd.sock'
+}
+state.config.tinc_config = {
+  uri: process.env.conf_dir || 'etc'
+}
+state.config.tincd = {
   command: process.env.tincd_path || 'sbin/tincd',
   args: [ '-D'
-    , '--config=' + conf_dir
+    , '--config=' + state.config.tinc_config.uri
     , '--pidfile=' + (process.env.pid_file || 'run/pid')
   ],
   env: {},
 }
-
-
-var state = { hosts: {} }
 
 var inspect = function (x) { return require('util').inspect(x, null, 23, true) }
 var log = require('./log')
 
-var use = {
-  config: true,
-  daemon: true,
-  server: true,
-}
 if (typeof process.env.use === 'string') {
   Object.keys(use).forEach(function (name) {
     use[name] = false
@@ -31,14 +34,14 @@ if (typeof process.env.use === 'string') {
     .split(',')
     .filter(function (x) { return !!x })
     .forEach(function (name) {
-      if (use.hasOwnProperty(name)) {
-        use[name] = true
+      if (state.use.hasOwnProperty(name)) {
+        state.use[name] = true
       } else {
         throw new Error('cannot use unknown module: ' + name)
       }
     })
 }
-log.info('use: ' + inspect(use))
+log.info('initial state:\n' + inspect(state))
 
 function to_array (x) {
   return Array.prototype.slice.call(x)
@@ -47,34 +50,16 @@ function to_array (x) {
 var EventEmitter = require('eventemitter2').EventEmitter2
 var events = new EventEmitter()
 
-var common_events = {
-  'info': log.info,
-  'error': log.error,
-}
-Object.keys(common_events).forEach(function (event) {
-  events.on(event, common_events[event])
-})
+events.on('info', log.info)
+events.on('error', log.error)
+
 events.onAny(function () {
   if (!events._events.hasOwnProperty(this.event)) {
     log.unhandled(this.event + ' ' + inspect(to_array(arguments)))
   }
 })
 
-state.config = {}
-state.config.tincd = daemon_options
-state.config.informer = {
-  uri: informer_socket
-}
-state.config.tinc_config = {
-  uri: conf_dir
-}
-
-state.use = {}
-if (use.server) {
-  state.use.informer = true
-}
-
-if (use.config) {
+if (state.use.tinc_config) {
 
   require('./parts/tinc_config').init(events, state)
 
@@ -98,7 +83,7 @@ if (use.config) {
   })
 }
 
-if (use.daemon) {
+if (state.use.tincd) {
 
   require('./parts/tincd').init(events, state)
 
@@ -108,7 +93,7 @@ if (use.daemon) {
 
 }
 
-if (use.server) {
+if (state.use.informer) {
 
   require('./parts/informer').init(events, state)
 
