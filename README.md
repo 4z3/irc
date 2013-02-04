@@ -17,7 +17,9 @@
     cp      /usr/sbin/tincd   /opt/retiolum/sbin/tincd
     chmod   710               /opt/retiolum/sbin/tincd
     chgrp   retiolum          /opt/retiolum/sbin/tincd
-    setcap  cap_net_admin+ep  /opt/retiolum/sbin/tincd
+    setcap  cap_net_admin=ep  /opt/retiolum/sbin/tincd
+
+  to bind to port 655 use `setcap cap_net_admin,cap_net_bind_service=ep`
 
 ### populate /opt/retiolum
 
