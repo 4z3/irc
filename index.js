@@ -42,7 +42,6 @@ if (typeof process.env.use === 'string') {
 }
 log.info('use: ' + inspect(use))
 
-if (use.server) var server = new tinc.Server()
 if (use.config) var config = new tinc.Config()
 
 if (use.config) {
@@ -92,13 +91,16 @@ Object.keys(common_events).forEach(function (event) {
   events.on(event, common_events[event])
 })
 events.onAny(function () {
-  if (!common_events.hasOwnProperty(this.event)) {
+  if (!events._events.hasOwnProperty(this.event)) {
     log.unhandled(this.event + ' ' + inspect(to_array(arguments)))
   }
 })
 
 state.config = {}
 state.config.tincd = daemon_options
+state.config.informer = {
+  uri: informer_socket
+}
 
 state.use = {}
 if (use.server) {
@@ -117,50 +119,24 @@ if (use.daemon) {
 
 if (use.server) {
 
-  server.on('listening', function () {
-    events.emit('informer-ready')
-  })
+  require('./parts/informer').init(events, state)
 
-  server.listen(informer_socket)
-
-  server.on('error', function (err) {
-    log.error('server: ' + err.message)
-    process.exit(1)
-  })
-
-  process.on('exit', function (code, signal) {
-    server.stop()
-  })
-
-  server.on('listening', function (uri) {
-    log.info('listening ' + uri)
-  })
-  server.on('host-up', function (hostname, remoteAddress, remotePort) {
+  events.on('host-up', function (hostname, remoteAddress, remotePort) {
     log.info('[32;1mUP[m ' + [ hostname ].join(' '))
   })
-  server.on('host-down', function (hostname, remoteAddress, remotePort) {
+  events.on('host-down', function (hostname, remoteAddress, remotePort) {
     log.info('[31;1mDN[m ' + [ hostname ].join(' '))
   })
-  server.on('subnet-up', function (hostname, remoteAddress, remotePort, subnet) {
+  events.on('subnet-up', function (hostname, remoteAddress, remotePort, subnet) {
     log.unhandled([ 'subnet-up', hostname, subnet].join(' '))
   })
-  server.on('subnet-down', function (hostname, remoteAddress, remotePort, subnet) {
+  events.on('subnet-down', function (hostname, remoteAddress, remotePort, subnet) {
     log.unhandled([ 'subnet-down', hostname, subnet].join(' '))
   })
 
   require('./parts/ip-config').init(events, state)
-  server.on('tinc-up', function (name, interface) {
-    events.emit('tinc-up', name, interface)
-  })
 
-  server.on('tinc-down', function (interface) {
-    log.unhandled('tinc-down ' + interface)
-  })
-  server.on('stopped', function () {
-    log.info('server stopped')
-  })
-
-  server.on('host-up', function (hostname, remoteAddress, remotePort) {
+  events.on('host-up', function (hostname, remoteAddress, remotePort) {
     if (!state.hosts[hostname]) {
       state.hosts[hostname] = { addresses: {} }
     }
@@ -169,7 +145,7 @@ if (use.server) {
     host.addresses[remoteAddress] = remotePort
     host.status = 'online'
   })
-  server.on('host-down', function (hostname, remoteAddress, remotePort) {
+  events.on('host-down', function (hostname, remoteAddress, remotePort) {
     if (!state.hosts[hostname]) {
       state.hosts[hostname] = { addresses: {} }
     }

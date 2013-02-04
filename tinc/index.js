@@ -1,5 +1,4 @@
 exports.Config = require('./config')
-exports.Server = require('./server')
 
 //var util = require('util')
 //var EventEmitter = require('events').EventEmitter
