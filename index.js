@@ -57,6 +57,16 @@ events.onAny(function () {
   }
 })
 
+process.on('exit', function (code, signal) {
+  log.info('Terminating')
+  events.emit('stop')
+})
+
+process.on('SIGINT', function () {
+  log.info('Got INT signal')
+  process.exit(0)
+})
+
 if (state.use.tinc_config) {
 
   require('./parts/tinc_config').init(events, state)
@@ -82,13 +92,7 @@ if (state.use.tinc_config) {
 }
 
 if (state.use.tincd) {
-
   require('./parts/tincd').init(events, state)
-
-  process.on('exit', function (code, signal) {
-    events.emit('stop')
-  })
-
 }
 
 if (state.use.informer) {
@@ -118,13 +122,3 @@ if (state.use.informer) {
     host.status = 'offline'
   })
 }
-
-
-process.on('exit', function (code, signal) {
-  log.info('Terminating')
-})
-
-process.on('SIGINT', function () {
-  log.info('Got INT signal')
-  process.exit(0)
-})
