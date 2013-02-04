@@ -77,10 +77,26 @@ if (use.config) {
   })
 }
 
-
-var EventEmitter = require('events').EventEmitter
+function to_array (x) {
+  return Array.prototype.slice.call(x)
+}
+
+var EventEmitter = require('eventemitter2').EventEmitter2
 var events = new EventEmitter()
 
+var common_events = {
+  'info': log.info,
+  'error': log.error,
+}
+Object.keys(common_events).forEach(function (event) {
+  events.on(event, common_events[event])
+})
+events.onAny(function () {
+  if (!common_events.hasOwnProperty(this.event)) {
+    log.unhandled(this.event + ' ' + inspect(to_array(arguments)))
+  }
+})
+
 state.config = {}
 state.config.tincd = daemon_options
 
@@ -92,12 +108,6 @@ if (use.server) {
 if (use.daemon) {
 
   require('./parts/tincd').init(events, state)
-  events.on('tinc-ready', function () {
-    log.info('tincd ready')
-  })
-  events.on('tincd-stopped', function () {
-    log.info('tincd stopped')
-  })
 
   process.on('exit', function (code, signal) {
     events.emit('stop')
@@ -142,8 +152,6 @@ if (use.server) {
   server.on('tinc-up', function (name, interface) {
     events.emit('tinc-up', name, interface)
   })
-  events.on('info', log.info)
-  events.on('error', log.error)
 
   server.on('tinc-down', function (interface) {
     log.unhandled('tinc-down ' + interface)
