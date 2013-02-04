@@ -3,6 +3,7 @@ var state = {
   config: {},
   use: {
     informer: true,
+    prettyprint_informer_events: true,
     ip_setup: true,
     tinc_config: true,
     tincd: true,
@@ -94,18 +95,7 @@ if (state.use.informer) {
 
   require('./parts/informer').init(events, state)
 
-  events.on('host-up', function (hostname, remoteAddress, remotePort) {
-    log.info('[32;1mUP[m ' + [ hostname ].join(' '))
-  })
-  events.on('host-down', function (hostname, remoteAddress, remotePort) {
-    log.info('[31;1mDN[m ' + [ hostname ].join(' '))
-  })
-  events.on('subnet-up', function (hostname, remoteAddress, remotePort, subnet) {
-    log.unhandled([ 'subnet-up', hostname, subnet].join(' '))
-  })
-  events.on('subnet-down', function (hostname, remoteAddress, remotePort, subnet) {
-    log.unhandled([ 'subnet-down', hostname, subnet].join(' '))
-  })
+  require('./parts/prettyprint_informer_events').init(events, state)
 
   require('./parts/ip_setup').init(events, state)
 
