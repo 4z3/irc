@@ -20,7 +20,6 @@ state.config.tincd = {
     , '--config=' + state.config.tinc_config.uri
     , '--pidfile=' + (process.env.pid_file || 'run/pid')
   ],
-  env: {},
 }
 
 var util = require('./util')
@@ -29,8 +28,8 @@ var log = util.log
 var to_array = util.to_array
 
 if (typeof process.env.use === 'string') {
-  Object.keys(use).forEach(function (name) {
-    use[name] = false
+  Object.keys(state.use).forEach(function (name) {
+    state.use[name] = false
   })
   process.env.use
     .split(',')
