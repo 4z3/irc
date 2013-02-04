@@ -125,7 +125,7 @@ if (use.server) {
     log.unhandled([ 'subnet-down', hostname, subnet].join(' '))
   })
 
-  require('./parts/ip-config').init(events, state)
+  require('./parts/ip_setup').init(events, state)
 
   events.on('host-up', function (hostname, remoteAddress, remotePort) {
     if (!state.hosts[hostname]) {
