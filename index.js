@@ -8,6 +8,7 @@ var state = {
     ip_setup: true,
     tinc_config: true,
     tincd: true,
+    manage_host_state: true,
   },
 }
 state.config.informer = {
@@ -73,15 +74,6 @@ if (state.use.tinc_config) {
   require('./parts/tinc_config').init(events, state)
 
   require('./parts/prettyprint_host_config_events.js').init(events, state)
-
-  events.on('host-load', function (hostname, config) {
-    if (!state.hosts[hostname]) {
-      state.hosts[hostname] = { addresses: {} }
-    }
-    var host = state.hosts[hostname]
-
-    host.config = config
-  })
 }
 
 if (state.use.tincd) {
@@ -95,23 +87,7 @@ if (state.use.informer) {
   require('./parts/prettyprint_informer_events').init(events, state)
 
   require('./parts/ip_setup').init(events, state)
-
-  events.on('host-up', function (hostname, remoteAddress, remotePort) {
-    if (!state.hosts[hostname]) {
-      state.hosts[hostname] = { addresses: {} }
-    }
-    var host = state.hosts[hostname]
-
-    host.addresses[remoteAddress] = remotePort
-    host.status = 'online'
-  })
-  events.on('host-down', function (hostname, remoteAddress, remotePort) {
-    if (!state.hosts[hostname]) {
-      state.hosts[hostname] = { addresses: {} }
-    }
-    var host = state.hosts[hostname]
-
-    host.addresses[remoteAddress] = remotePort
-    host.status = 'offline'
-  })
 }
+
+// TODO watch out for dependencies!
+require('./parts/manage_host_state').init(events, state)
