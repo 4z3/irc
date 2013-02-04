@@ -34,7 +34,7 @@ exports.init = function (events, state) {
           })
           .forEach(function (config) {
             [ config.options.concat(['addr', 'add', subnet, 'dev', interface])
-            , config.options.concat(['route', 'add', subnet, 'dev', interface])
+            , config.options.concat(['route', 'add', config.route, 'dev', interface])
             ].forEach(function (args) {
               count++
               ip(args).on('exit', function (code) {
