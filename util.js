@@ -25,3 +25,7 @@ exports.log = {
     log('[30m' + message.replace(/\[39m/g, '[30m') + '[m')
   },
 }
+
+exports.to_array = function (x) {
+  return Array.prototype.slice.call(x)
+}

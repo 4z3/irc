@@ -23,8 +23,10 @@ state.config.tincd = {
   env: {},
 }
 
-var inspect = require('./util').inspect
-var log = require('./util').log
+var util = require('./util')
+var inspect = util.inspect
+var log = util.log
+var to_array = util.to_array
 
 if (typeof process.env.use === 'string') {
   Object.keys(use).forEach(function (name) {
@@ -42,10 +44,6 @@ if (typeof process.env.use === 'string') {
     })
 }
 log.info('initial state:\n' + inspect(state))
-
-function to_array (x) {
-  return Array.prototype.slice.call(x)
-}
 
 var EventEmitter = require('eventemitter2').EventEmitter2
 var events = new EventEmitter()
