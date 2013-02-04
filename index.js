@@ -17,8 +17,6 @@ var state = { hosts: {} }
 
 var inspect = function (x) { return require('util').inspect(x, null, 23, true) }
 var log = require('./log')
-var tinc = require('./tinc')
-
 
 var use = {
   config: true,
@@ -41,40 +39,6 @@ if (typeof process.env.use === 'string') {
     })
 }
 log.info('use: ' + inspect(use))
-
-if (use.config) var config = new tinc.Config()
-
-if (use.config) {
-
-  config.watch(conf_dir)
-
-  config.on('error', function (err) {
-    log.error('config: ' + err.message)
-    process.exit(1)
-  })
-
-  config.on('watching', function (uri) {
-    log.info('watching ' + uri)
-  })
-  config.on('host-load', function (hostname, config) {
-    log.info('host-load ' + hostname + ' ' + inspect(config))
-  })
-  config.on('host-reload', function (hostname, config) {
-    log.unhandled([ 'host-reload', hostname, inspect(config)].join(' '))
-  })
-  config.on('host-unload', function (hostname) {
-    log.unhandled([ 'host-unload', hostname].join(' '))
-  })
-
-  config.on('host-load', function (hostname, config) {
-    if (!state.hosts[hostname]) {
-      state.hosts[hostname] = { addresses: {} }
-    }
-    var host = state.hosts[hostname]
-
-    host.config = config
-  })
-}
 
 function to_array (x) {
   return Array.prototype.slice.call(x)
@@ -101,12 +65,39 @@ state.config.tincd = daemon_options
 state.config.informer = {
   uri: informer_socket
 }
+state.config.tinc_config = {
+  uri: conf_dir
+}
 
 state.use = {}
 if (use.server) {
   state.use.informer = true
 }
+
+if (use.config) {
 
+  require('./parts/tinc_config').init(events, state)
+
+  events.on('host-load', function (hostname, config) {
+    log.info('host-load ' + hostname + ' ' + inspect(config))
+  })
+  events.on('host-reload', function (hostname, config) {
+    log.unhandled([ 'host-reload', hostname, inspect(config)].join(' '))
+  })
+  events.on('host-unload', function (hostname) {
+    log.unhandled([ 'host-unload', hostname].join(' '))
+  })
+
+  events.on('host-load', function (hostname, config) {
+    if (!state.hosts[hostname]) {
+      state.hosts[hostname] = { addresses: {} }
+    }
+    var host = state.hosts[hostname]
+
+    host.config = config
+  })
+}
+
 if (use.daemon) {
 
   require('./parts/tincd').init(events, state)
