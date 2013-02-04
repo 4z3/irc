@@ -4,6 +4,7 @@ var state = {
   use: {
     informer: true,
     prettyprint_informer_events: true,
+    prettyprint_host_config_events: true,
     ip_setup: true,
     tinc_config: true,
     tincd: true,
@@ -71,15 +72,7 @@ if (state.use.tinc_config) {
 
   require('./parts/tinc_config').init(events, state)
 
-  events.on('host-load', function (hostname, config) {
-    log.info('host-load ' + hostname + ' ' + inspect(config))
-  })
-  events.on('host-reload', function (hostname, config) {
-    log.unhandled([ 'host-reload', hostname, inspect(config)].join(' '))
-  })
-  events.on('host-unload', function (hostname) {
-    log.unhandled([ 'host-unload', hostname].join(' '))
-  })
+  require('./parts/prettyprint_host_config_events.js').init(events, state)
 
   events.on('host-load', function (hostname, config) {
     if (!state.hosts[hostname]) {
