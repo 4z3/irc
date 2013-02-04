@@ -23,8 +23,8 @@ state.config.tincd = {
   env: {},
 }
 
-var inspect = function (x) { return require('util').inspect(x, null, 23, true) }
-var log = require('./log')
+var inspect = require('./util').inspect
+var log = require('./util').log
 
 if (typeof process.env.use === 'string') {
   Object.keys(use).forEach(function (name) {
