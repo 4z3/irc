@@ -7,14 +7,14 @@ exports.init = function (events, state) {
     }
   })
 
-  function handler (req, callback) {
+  function handler (req, callback, wait) {
     switch (req.headers['x-github-event']) {
-      case 'push': return push_handler(req, callback)
+      case 'push': return push_handler(req, callback, wait)
       default:
     }
   }
 
-  function push_handler (req, callback) {
+  function push_handler (req, callback, wait) {
     var form = new IncomingForm()
     form.type = 'urlencoded'
     form.maxFieldsSize = 16 * 1024
@@ -53,6 +53,12 @@ exports.init = function (events, state) {
       } else {
         finish(null, 400)
       }
+    })
+
+    form.on('progress', function (bytesReceived, bytesExpected) {
+      // TODO ping http_server so we don't time out
+      events.emit('github_post_receive_form_progress', bytesReceived, bytesExpected)
+      wait(1000)
     })
 
     function finish (error, code) {
