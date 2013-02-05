@@ -2,6 +2,7 @@
   "name": "retiolum-control",
   "version": "0.0.0",
   "dependencies": {
+    "formidable": "*",
     "eventemitter2": "*",
     "inotify": "*"
   }
