@@ -23,6 +23,9 @@ exports.log = {
     log(message)
   },
   error: function (message) {
+    if (typeof message !== 'string') {
+      message = exports.inspect(message)
+    }
     log('[31m' + message.replace(reset_seq, '[;31m') + '[m')
   },
   unhandled: function (message) {
