@@ -56,7 +56,6 @@ exports.init = function (events, state) {
     })
 
     form.on('progress', function (bytesReceived, bytesExpected) {
-      // TODO ping http_server so we don't time out
       events.emit('github_post_receive_form_progress', bytesReceived, bytesExpected)
       wait(1000)
     })
