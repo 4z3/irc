@@ -9,6 +9,7 @@ var state = {
     tinc_config: true,
     tincd: true,
     manage_host_state: true,
+    http_server: true,
   },
 }
 state.config.informer = {
@@ -23,6 +24,9 @@ state.config.tincd = {
     , '--config=' + state.config.tinc_config.uri
     , '--pidfile=' + (process.env.pid_file || 'run/pid')
   ],
+}
+state.config.http_server = {
+  port: 1027
 }
 
 var util = require('./util')
