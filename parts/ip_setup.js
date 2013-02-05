@@ -1,5 +1,6 @@
 var spawn = require('child_process').spawn
 var make_data_to_lines = require('../events-utils').make_data_to_lines
+var inspect = require('../util').inspect
 
 exports.init = function (events, state) {
   events.on('tinc-up', function (name, interface) {
