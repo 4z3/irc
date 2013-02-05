@@ -15,32 +15,47 @@ exports.init = function (events, state) {
   })
 
   function listener (req, res) {
-    var timeout_id = setTimeout(function () { accept(not_found) }, 100)
+    var timeout_id, finished
 
     events.emit('http_server',
       req.connection.remoteAddress, req.method, req.url)
 
-    var taken = false
     function accept (handler) {
-      if (!taken) {
-        taken = true
+      schedule(gateway_timeout, 100)
+      handler(req, finish, wait)
+    }
 
-        // TODO replace with gateway_timeout
-        clearTimeout(timeout_id)
-
-        return handler(req, function (code, headers, content) {
-          events.emit('http_server',
-            req.connection.remoteAddress, req.method, req.url, code)
-          // TODO check arguments
-          if (code) {
-            res.writeHead(code, headers)
-            res.end(content)
-          }
-        })
+    function finish (code, headers, content) {
+      if (finished) {
+        return events.emit('error', 'http_server late result: ' + [
+          req.connection.remoteAddress,
+          req.method,
+          req.url,
+          code,
+        ].map(inspect).join(', '))
       } else {
-        events.emit('warn.http_server', 'multiple accept() attempts', handler)
+        finished = true
+        clearTimeout(timeout_id)
+        events.emit('http_server',
+          req.connection.remoteAddress, req.method, req.url, code)
+        // TODO check arguments
+        if (code) {
+          res.writeHead(code, headers)
+          res.end(content)
+        }
       }
     }
+
+    function schedule (handler, delay) {
+      clearTimeout(timeout_id)
+      timeout_id = setTimeout(function () { accept(handler) }, delay)
+    }
+
+    function wait (delay) {
+      schedule(gateway_timeout, typeof delay === void 0 ? 100 : delay)
+    }
+
+    schedule(not_found, 100)
 
     // TODO parse url (and put it into req)
     events.emit('http-req', req.url, accept)
@@ -49,4 +64,7 @@ exports.init = function (events, state) {
 
 function not_found (req, callback) {
   return callback(404)
+}
+function gateway_timeout (req, callback) {
+  return callback(504)
 }
