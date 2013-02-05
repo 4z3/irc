@@ -2,6 +2,8 @@ var inspect = require('util').inspect
 
 exports.inspect = function (x) {
   return inspect(x, null, 23, true)
+    .replace(/\[33mtrue\[39m/g, '[1;32mtrue[;39m')
+    .replace(/\[33mfalse\[39m/g, '[1;31mfalse[;39m')
 }
 
 var t0 = new Date
