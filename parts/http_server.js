@@ -52,7 +52,7 @@ exports.init = function (events, state) {
     }
 
     function wait (delay) {
-      schedule(gateway_timeout, typeof delay === void 0 ? 100 : delay)
+      schedule(gateway_timeout, arguments.length < 1 ? 100 : delay)
     }
 
     schedule(not_found, 100)
