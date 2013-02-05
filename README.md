@@ -50,7 +50,7 @@
 
     node $somewhere
 
-### install up/down scripts
+### install up and down scripts
 
   this requires [socat](http://www.dest-unreach.org/socat/)
 
@@ -58,3 +58,23 @@
     for script in {tinc,host,subnet}-{up,down}; do
       ln -s $somewhere/informer $script
     done
+
+### keep etc/hosts up-to-date with `parts/github_post_receive.js`
+
+    su - retiolum
+
+    mkdir src
+    cd src
+    git init
+    git remote add -f github https://github.com/krebscode/painload
+    git config core.sparsecheckout true
+    echo retiolum/hosts > .git/info/sparse-checkout
+    cd ..
+
+  if there is already an `etc/hosts` directory, remove it
+
+    rm -fR etc/hosts
+
+  link the repository's host configuration directory to etc/
+
+    ln -s ../src/retiolum/hosts etc/
