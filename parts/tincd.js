@@ -18,6 +18,11 @@ function init (events, state) {
 
   var tincd = spawn(command, args, options)
 
+  events.on('stop', function () {
+    tincd.kill()
+    events.emit('tincd-stopped')
+  })
+
   tincd.stdout.on('data', make_data_to_lines(tincd.stdout))
   tincd.stderr.on('data', make_data_to_lines(tincd.stderr))
 
@@ -27,11 +32,7 @@ function init (events, state) {
   })
 
   tincd.stdout.on('line', function (line) {
-    events.emit('info', '[33;1mtincd stdout: ' + line + '[m')
-  })
-
-  tincd.stderr.on('line', function (line) {
-    events.emit('info', '[33mtincd stderr: ' + line + '[m')
+    events.emit(['tincd','stdout'], line)
   })
 
   tincd.stderr.on('line', function ready_listener (line) {
@@ -41,8 +42,76 @@ function init (events, state) {
     }
   })
 
-  events.on('stop', function () {
-    tincd.kill()
-    events.emit('tincd-stopped')
-  })
+  tincd.stderr.on('line', read_from_line)
+
+  function read_from_line (line) {
+    var next = {
+      'Nodes:': read_node_from_line,
+      'Edges:':  read_edge_from_line,
+      'Subnet list:': read_subnet_from_line,
+      'Connections:': read_conns_from_line,
+    }
+    if (next[line]) {
+      tincd.stderr.removeListener('line', read_from_line)
+      tincd.stderr.on('line', next[line])
+    } else {
+      return events.emit(['tincd','stderr'], line)
+    }
+  }
+
+  function read_node_from_line (line) {
+    if (line === 'End of nodes.') {
+      tincd.stderr.removeListener('line', read_node_from_line)
+      tincd.stderr.on('line', read_from_line)
+    } else {
+      var node = {}
+      line = ('hostname' + line.replace(/[()]/g,'')).split(' ')
+      for (var i = 0, n = line.length; i < n; i += 2) {
+        node[line[i]] = line[i+1]
+      }
+      events.emit('node', node)
+    }
+  }
+
+  function read_edge_from_line (line) {
+    if (line === 'End of edges.') {
+      tincd.stderr.removeListener('line', read_edge_from_line)
+      tincd.stderr.on('line', read_from_line)
+    } else {
+      var edge = {}
+      line = ('hostname' + line).split(' ')
+      for (var i = 0, n = line.length; i < n; i += 2) {
+        edge[line[i]] = line[i+1]
+      }
+      events.emit('edge', edge)
+    }
+  }
+
+  function read_subnet_from_line (line) {
+    if (line === 'End of subnet list.') {
+      tincd.stderr.removeListener('line', read_subnet_from_line)
+      tincd.stderr.on('line', read_from_line)
+    } else {
+      var subnet = {}
+      line = ('subnet' + line).split(' ')
+      for (var i = 0, n = line.length; i < n; i += 2) {
+        subnet[line[i]] = line[i+1]
+      }
+      events.emit('subnet', subnet)
+    }
+  }
+
+  function read_conns_from_line (line) {
+    if (line === 'End of connections.') {
+      tincd.stderr.removeListener('line', read_conns_from_line)
+      tincd.stderr.on('line', read_from_line)
+    } else {
+      var connection = {}
+      line = ('hostname' + line).split(' ')
+      for (var i = 0, n = line.length; i < n; i += 2) {
+        connection[line[i]] = line[i+1]
+      }
+      events.emit('connection', connection)
+    }
+  }
 }
