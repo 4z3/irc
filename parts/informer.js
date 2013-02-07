@@ -9,22 +9,22 @@ exports.init = function (events, state) {
   var server
 
   setup(function () {
-  switch (url.protocol) {
-    case undefined:
-    case 'unix:':
-      server = new net.Server(listener)
-      server.listen(url.pathname, function () {
-        events.on('stop', function () {
-          // TODO async & handle error
-          fs.unlinkSync(url.pathname)
-          events.emit('informer-stopped')
+    switch (url.protocol) {
+      case undefined:
+      case 'unix:':
+        server = new net.Server(listener)
+        server.listen(url.pathname, function () {
+          events.on('stop', function () {
+            // TODO async & handle error
+            fs.unlinkSync(url.pathname)
+            events.emit('informer-stopped')
+          })
+          events.emit('informer-ready')
         })
-        events.emit('informer-ready')
-      })
-      break
-    default:
-      events.emit('error', 'bad uri: ' + state.config.informer.uri)
-  }
+        break
+      default:
+        events.emit('error', 'bad uri: ' + state.config.informer.uri)
+    }
   })
 
   function listener (socket) {
