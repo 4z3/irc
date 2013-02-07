@@ -50,15 +50,6 @@
 
     node $somewhere
 
-### install up and down scripts
-
-  this requires [socat](http://www.dest-unreach.org/socat/)
-
-    su - retiolum
-    for script in {tinc,host,subnet}-{up,down}; do
-      ln -s $somewhere/informer $script
-    done
-
 ### keep etc/hosts up-to-date with `parts/github_post_receive.js`
 
     su - retiolum
@@ -78,3 +69,7 @@
   link the repository's host configuration directory to etc/
 
     ln -s ../src/retiolum/hosts etc/
+
+### requirements
+
+  `parts/informer.js` requires [socat](http://www.dest-unreach.org/socat/)
