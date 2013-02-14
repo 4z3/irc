@@ -22,6 +22,7 @@ state.config.tinc_config = {
 state.config.tincd = {
   command: process.env.tincd_path || 'sbin/tincd',
   args: [ '-D'
+    , '--debug=' + (process.env.debug || 5)
     , '--config=' + state.config.tinc_config.uri
     , '--pidfile=' + (process.env.pid_file || 'run/pid')
   ],
