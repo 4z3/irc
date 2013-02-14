@@ -164,7 +164,7 @@ function init (events, state) {
   function add_subnet (owner, subnet, weight) {
     if (!subnets[owner]) {
       subnets[owner] = {}
-      events.emit('host-up', owner)
+      events.emit('ADD_SUBNET/host-up', owner)
     }
     subnets[owner][subnet] = weight
     events.emit('ADD_SUBNET', owner, subnet, weight)
@@ -174,7 +174,7 @@ function init (events, state) {
     events.emit('DEL_SUBNET', owner, subnet)
     if (Object.keys(subnets[owner]).length === 0) {
       delete subnets[owner]
-      events.emit('host-down', owner)
+      events.emit('DEL_SUBNET/host-down', owner)
     }
   }
   function add_edge (source, target, weight) {
