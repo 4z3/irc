@@ -28,7 +28,7 @@ state.config.tincd = {
   ],
 }
 state.config.http_server = {
-  port: 1027
+  port: process.env.PORT || 1027
 }
 
 var util = require('./util')
