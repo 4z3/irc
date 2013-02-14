@@ -60,7 +60,7 @@ function read (input) {
         var i = line.indexOf(' ')
         if (i > 0) {
           service.uri = line.slice(0, i)
-          service.rest = line.slice(i).replace(/^\s+/, '') // ltrim
+          service.comment = line.slice(i).replace(/^\s+/, '') // ltrim
         } else {
           service.uri = line
         }
