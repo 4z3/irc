@@ -3,8 +3,6 @@ var state = {
   config: {},
   use: {
     informer: true,
-    prettyprint_informer_events: true,
-    prettyprint_host_config_events: true,
     ip_setup: true,
     tinc_config: true,
     tincd: true,
