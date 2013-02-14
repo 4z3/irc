@@ -4,6 +4,8 @@ exports.inspect = function (x) {
   return inspect(x, null, 23, true)
     .replace(/\[33mtrue\[39m/g, '[1;32mtrue[;39m')
     .replace(/\[33mfalse\[39m/g, '[1;31mfalse[;39m')
+    .replace(/(\[32m)'/g, '$1')
+    .replace(/'(\[39m)/g, '$1')
 }
 
 var t0 = new Date
