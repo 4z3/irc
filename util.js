@@ -1,5 +1,5 @@
 var inspect = require('util').inspect
-exports.inspect = function _inspect (x) {
+exports.inspect = function _inspect (x, type) {
   if (is_array_like(x)) {
     return ''+Array.prototype.slice.call(x).map(_inspect)
   }
@@ -9,6 +9,11 @@ exports.inspect = function _inspect (x) {
     .replace(/\[33mfalse\[39m/g, '[1;31mfalse[;39m')
     .replace(/(\[32m)'/g, '$1')
     .replace(/'(\[39m)/g, '$1')
+
+  if (type === 'bad') {
+    result = result
+      .replace(/(\[[^m]*)32([^m]*m)/g, '$131$2')
+  }
 
   return result
 }
