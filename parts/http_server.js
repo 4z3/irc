@@ -14,6 +14,39 @@ exports.init = function (events, state) {
     // TODO anything else?
   })
 
+  server.on('upgrade', function (req, socket, head) {
+    var timeout_id = setTimeout(function () {
+      socket.end()
+      events.emit('error', 'http-upgrade failed')
+    }, 100)
+
+    var take = (function (is_taken) {
+      return function take (upgrade) {
+        if (is_taken) {
+          events.emit('error', 'http_server upgrade late: ' + [
+            req.connection.remoteAddress,
+            req.method,
+            req.url,
+          ].map(inspect))
+        } else {
+          is_taken = true
+          clearTimeout(timeout_id)
+          upgrade(req, socket, head)
+        }
+      }
+    })()
+
+    events.emit('http_server upgrade ' + [
+        req.connection.remoteAddress,
+        req.method,
+        req.url
+      ].map(inspect)
+      + '\n'
+      + inspect(req.headers))
+
+    events.emit('http-upgrade/' + req.headers.upgrade, req.url, take)
+  })
+
   function listener (req, res) {
     var timeout_id, finished
 
