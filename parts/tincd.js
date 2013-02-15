@@ -141,17 +141,17 @@ function init (events, state) {
           match = rest.split(' ').slice(2) // 0 = %devent, 1 = %xcruft
           match[1] = match[1].split('#') // meh
           var owner = match[0]
-          var subnet   = match[1][0]
+          var subnet = match[1][0]
           //var weight = Number(match[1][1])
           return del_subnet(owner, subnet)
         case 'ADD_EDGE':
           match = rest.split(' ')
           var source = match[2]
           var target = match[3]
-          var target_address  = match[4]
-          var target_port     = match[5]
-          var options         = match[6]
-          var weight          = Number(match[7])
+          var target_address = match[4]
+          var target_port = match[5]
+          var options = match[6]
+          var weight = Number(match[7])
           return add_edge(source, target, weight)
         case 'DEL_EDGE':
           match = rest.split(' ')
