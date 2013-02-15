@@ -23,11 +23,11 @@ exports.init = function (events, state) {
     var take = (function (is_taken) {
       return function take (upgrade) {
         if (is_taken) {
-          events.emit('error', 'http_server upgrade late: ' + [
+          events.emit('error', 'http_server upgrade late: ' + inspect([
             req.connection.remoteAddress,
             req.method,
             req.url,
-          ].map(inspect))
+          ]))
         } else {
           is_taken = true
           clearTimeout(timeout_id)
@@ -36,13 +36,12 @@ exports.init = function (events, state) {
       }
     })()
 
-    events.emit('http_server upgrade ' + [
+    events.emit('http_server upgrade ' + inspect([
         req.connection.remoteAddress,
         req.method,
-        req.url
-      ].map(inspect)
-      + '\n'
-      + inspect(req.headers))
+        req.url,
+        req.headers,
+    ]))
 
     events.emit('http-upgrade/' + req.headers.upgrade, req.url, take)
   })
@@ -60,12 +59,12 @@ exports.init = function (events, state) {
 
     function finish (code, headers, content) {
       if (finished) {
-        return events.emit('error', 'http_server late result: ' + [
+        return events.emit('error', 'http_server late result: ' + inspect([
           req.connection.remoteAddress,
           req.method,
           req.url,
           code,
-        ].map(inspect).join(', '))
+        ]))
       } else {
         finished = true
         clearTimeout(timeout_id)
