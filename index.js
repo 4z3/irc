@@ -17,6 +17,10 @@ state.config.informer = {
 state.config.tinc_config = {
   uri: process.env.conf_dir || 'etc'
 }
+state.config.services = {
+  bootstrap_file: '/krebs/services/etc/services/bootstrap',
+  identity_file: process.env.identity_file || 'etc/id_rsa',
+}
 state.config.tincd = {
   command: process.env.tincd_path || 'sbin/tincd',
   args: [ '-D'
