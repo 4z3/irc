@@ -32,7 +32,6 @@ state.config.http_server = {
 var util = require('./util')
 var inspect = util.inspect
 var log = util.log
-var to_array = util.to_array
 
 if (typeof process.env.use === 'string') {
   Object.keys(state.use).forEach(function (name) {
@@ -59,7 +58,10 @@ events.on('error', log.error)
 
 events.onAny(function () {
   if (!events._events.hasOwnProperty(this.event)) {
-    log.unhandled(this.event + ' ' + inspect(to_array(arguments)))
+    var args = inspect(arguments)
+    if (!log_blacklist(this.event, args)) {
+      log.unhandled(this.event + ' ' + args)
+    }
   }
 })
 

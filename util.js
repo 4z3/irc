@@ -1,11 +1,21 @@
 var inspect = require('util').inspect
+exports.inspect = function _inspect (x) {
+  if (is_array_like(x)) {
+    return ''+Array.prototype.slice.call(x).map(_inspect)
+  }
 
-exports.inspect = function (x) {
-  return inspect(x, null, 23, true)
+  var result = inspect(x, null, 23, true)
     .replace(/\[33mtrue\[39m/g, '[1;32mtrue[;39m')
     .replace(/\[33mfalse\[39m/g, '[1;31mfalse[;39m')
     .replace(/(\[32m)'/g, '$1')
     .replace(/'(\[39m)/g, '$1')
+
+  return result
+}
+function is_array_like (x) {
+  return typeof x === 'object'
+      && typeof x.length === 'number'
+      && typeof x.length === 'number'
 }
 
 var t0 = new Date
@@ -33,8 +43,4 @@ exports.log = {
   unhandled: function (message) {
     log('[30m' + message.replace(reset_seq, '[;30m') + '[m')
   },
-}
-
-exports.to_array = function (x) {
-  return Array.prototype.slice.call(x)
 }
