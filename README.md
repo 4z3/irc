@@ -70,6 +70,11 @@
 
     ln -s ../src/retiolum/hosts etc/
 
+### parts/services.js setup
+
+    su - retiolum
+    ssh-keygen -f etc/id_rsa  # passphrase is currently unsupported
+
 ### requirements
 
   `parts/informer.js` requires [socat](http://www.dest-unreach.org/socat/)
