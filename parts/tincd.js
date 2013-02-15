@@ -142,6 +142,7 @@ function init (events, state) {
           match[1] = match[1].split('#') // meh
           var owner = match[0]
           var subnet   = match[1][0]
+          //var weight = Number(match[1][1])
           return del_subnet(owner, subnet)
         case 'ADD_EDGE':
           match = rest.split(' ')
