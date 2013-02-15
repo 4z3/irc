@@ -199,7 +199,8 @@ function read (input) {
 
   input.on('data', function (data) {
     data = (buffer + data)
-      .replace(/\n +/mg, ' ') // join multi-part lines; TODO preserve \n w/ \
+      // TODO preserve \n when there's no trailing \
+      .replace(/\n +/mg, ' ')
       .toString().split('\n')
 
     buffer = data.pop()
