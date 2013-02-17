@@ -1,0 +1,74 @@
+* {
+  margin: 0px; padding: 0px;
+}
+body {
+ overflow: hidden;
+}
+svg {
+}
+
+.node {
+  fill: rgb(100,100,100);
+  stroke: white;
+  stroke-width: 1px;
+  stroke-opacity: 1.0;
+}
+.node circle {
+  r: 5;
+}
+
+.node .focus {
+  stroke: #ff8;
+}
+
+.node :hover {
+  stroke: #ff4;
+}
+
+.edge {
+  stroke: #999;
+  stroke-opacity: .3;
+}
+.edge .focus {
+  stroke: #ff8;
+  stroke-opacity: 1.0;
+}
+.edge :hover {
+  stroke: #ff4;
+  stroke-opacity: 1.0;
+}
+
+.edge path {
+  fill: none;
+  x-stroke: magenta;
+  stroke: #424242;
+  stroke-width: 0.5px;
+  stroke-opacity: .3;
+}
+
+text {
+  font: 8px monospace;
+  pointer-events: none;
+  x-stroke: white;
+  x-stroke-width: 0.2px;
+  fill: black;
+  x-text-shadow: -2px 0 white, 0 2px white, 2px 0 white, 0 -2px white;
+}
+
+#statusbar {
+  font: 10px monospace;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+}
+#socket .open { color: green; }
+#socket .closed { color: red; }
+
+#info {
+  font: 10px monospace;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  x-text-shadow: -1px 0 white, 0 1px white, 1px 0 white, 0 -1px white;
+  x-text-shadow: -1px 0 1px white, 0 1px 1px white, 1px 0 1px white, 0 -1px 1px white;
+}
