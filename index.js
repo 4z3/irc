@@ -9,6 +9,7 @@ var state = {
     manage_host_state: true,
     http_server: true,
     github_post_receive: true,
+    dashboard: true,
     services: true,
   },
 }
