@@ -456,29 +456,15 @@ function update_info () {
   var info_div = document.getElementById('info')
   info_div.innerHTML = info_toString()
 }
-function focus_toString () {
-  var html = ''
-  var focus = get_focus()
-  if (focus) {
-    html += focus.node
-  }
-  var hover = get_hover()
-  if (hover) {
-    if (!focus || focus.node !== hover.node) {
-      if (focus) html += ' '
-      html += '(' + hover.node + ')'
-    }
-  }
-  return html
-}
 function info_toString () {
   var html = ''
 
   html += '<div>socket:&nbsp;' + socket_toString() + '</div>'
-  html += '<div>focus:&nbsp;' + focus_toString() + '</div>'
+  html += '<br>'
 
   var focus = get_hover() || get_focus()
   if (focus) {
+    html += '<h1>' + focus.node + '</h2>'
     if (focus.node instanceof Edge) {
       html += '<h2>weight</h2>'
       html += focus.node.weight
