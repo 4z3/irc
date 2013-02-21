@@ -508,6 +508,8 @@ function info_toString () {
             html += info[key]
         }
       })
+    } else {
+      html += '<i>no information available</i>'
     }
   }
   return html
