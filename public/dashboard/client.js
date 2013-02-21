@@ -456,10 +456,33 @@ function update_info () {
   var info_div = document.getElementById('info')
   info_div.innerHTML = info_toString()
 }
+function net_stats_toString () {
+  var html = ''
+  html += '<h2>statistics</h2>'
+  html += '<ul>'
+  html += '<li>'
+  html += 'active nodes: '.replace(' ', '&nbsp;')
+  // TODO reachable nodes (reqs. sth. like node.info.is_supernode)
+  // TODO colorize unreachable edges differently
+  html += nodes.filter(function (node) { return node.weight > 0 }).length
+  html += '</li>'
+  html += '<li>'
+  html += 'connections: '.replace(' ', '&nbsp;')
+  // TODO definition of connection. in the old graph it looks like a connection
+  //  is the existance of two edges between two nodes, i.e. A->B and B->A.
+  // TODO properly enumerate (reachable) connections
+  html += edges.length / 2 | 0
+  html += '</li>'
+  html += '</ul>'
+  return '<div>' + html + '</div>'
+}
 function info_toString () {
   var html = ''
 
   html += '<div>socket:&nbsp;' + socket_toString() + '</div>'
+  html += '<br>'
+
+  html += net_stats_toString()
   html += '<br>'
 
   var focus = get_hover() || get_focus()
