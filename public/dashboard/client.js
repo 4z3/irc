@@ -443,8 +443,7 @@ function socket_toString () {
       status += ')'
       break
   }
-  html = '<span class="' + type + '">' + status + '</span>'
-  html = '<span id="socket">socket:&nbsp;' + html + '</span>'
+  html = '<span id="socket" class="' + type + '">' + status + '</span>'
   return html
 }
 
@@ -470,13 +469,13 @@ function focus_toString () {
       html += '(' + hover.node + ')'
     }
   }
-  return '<div>focus:&nbsp;' + html + '</div>'
+  return html
 }
 function info_toString () {
   var html = ''
 
-  html += socket_toString()
-  html += focus_toString()
+  html += '<div>socket:&nbsp;' + socket_toString() + '</div>'
+  html += '<div>focus:&nbsp;' + focus_toString() + '</div>'
 
   var focus = get_hover() || get_focus()
   if (focus) {

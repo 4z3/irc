@@ -61,8 +61,8 @@ text {
   top: 0px;
   left: 0px;
 }
-#socket .open { color: green; }
-#socket .closed { color: red; }
+#socket.open { color: green; }
+#socket.closed { color: red; }
 
 #info {
   font: 10px monospace;
