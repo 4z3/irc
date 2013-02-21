@@ -513,8 +513,10 @@ function info_toString () {
             // hide
             break
           case 'last_ssh_check':
-            html += '<h2>' + key + '</h2>'
-            html += (new Date(info[key])).toISOString()
+            (function () {
+              html += '<h2>' + key + '</h2>'
+              html += this.format() + ' (' + this.fromNow() + ')'
+            }).call(moment(new Date(info[key])))
             break
           default:
             html += '<h2>' + key + '</h2>'
