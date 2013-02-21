@@ -296,8 +296,7 @@ function SNAPSHOT (param) {
   Object.keys(param.services).forEach(function (hostname) {
     set_info(param.services[hostname])
   })
-
-  update()
+  update_info()
 }
 
 function ADD_SUBNET (param) {
@@ -319,6 +318,7 @@ function ADD_SUBNET (param) {
   node.subnets[param.subnet] = param.weight
 
   update()
+  update_info()
 }
 function DEL_SUBNET (param) {
   var node = find_node(param.owner)
@@ -327,6 +327,7 @@ function DEL_SUBNET (param) {
     delete_node(node)
   }
   update()
+  update_info()
 }
 
 // buffer for edges with missing nodes
@@ -367,6 +368,7 @@ function ADD_EDGE (param) {
 
   // TODO only update if something has changed(?)
   update()
+  update_info()
 }
 function DEL_EDGE (param) {
   for (var i = edges.length - 1; i >= 0; i--) {
@@ -377,6 +379,7 @@ function DEL_EDGE (param) {
     }
   }
   update()
+  update_info()
 }
 
 function unlink_node (node) {
