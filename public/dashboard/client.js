@@ -198,6 +198,7 @@ function edge_update (sel) {
       }
       return 'rgb(' + [r,g,b] + ')'
     })
+    .classed('focus', is_focus)
 }
 function edge_exit(sel) {
   sel.remove()
