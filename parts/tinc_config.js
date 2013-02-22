@@ -4,6 +4,10 @@ var Inotify = require('inotify').Inotify
 var crypto = require('crypto')
 
 exports.init = function (events, state) {
+
+  state.tinc_config = {}
+  var hosts = state.tinc_config.hosts = {}
+
   var hosts_path = path.join(state.config.tinc_config.uri, 'hosts')
 
   var digests = {}
@@ -83,6 +87,25 @@ exports.init = function (events, state) {
     })
   }
 
+  events.on('host-load', host_load)
+  events.on('host-reload', host_reload)
+  events.on('host-unload', host_unload)
+
+  function host_load (hostname, config) {
+    hosts[hostname] = {
+      hostname: hostname,
+      config: config,
+    }
+  }
+  function host_reload (hostname, config) {
+    hosts[hostname] = {
+      hostname: hostname,
+      config: config,
+    }
+  }
+  function host_unload (hostname) {
+    delete hosts[hostname]
+  }
 }
 
 function is_tinc_hostname (x) {

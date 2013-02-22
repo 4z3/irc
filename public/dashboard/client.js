@@ -70,6 +70,7 @@ window.onload = function () {
     .on('ADD_SUBNET', ADD_SUBNET)
     .on('DEL_SUBNET', DEL_SUBNET)
     .on('services', set_info) // TODO rename to INFO
+    .on('config', set_config)
     .on('close', function () {
       nodes.splice(0, nodes.length)
       edges.splice(0, edges.length)
@@ -110,7 +111,7 @@ var set_focus, get_focus
   set_focus = function (node, that) {
     // clear
     if (focus) {
-      d3.select(focus.that).attr('class', '')
+      d3.select(focus.that).classed('focus', false)
       focus = null
     }
     if (node && that) {
@@ -118,7 +119,7 @@ var set_focus, get_focus
         node: node,
         that: that,
       }
-      d3.select(focus.that).attr('class', 'focus')
+      d3.select(focus.that).classed('focus', true)
     }
     update_info()
     d3.event.stopPropagation()
@@ -178,9 +179,8 @@ function update () {
     })
   path.exit().remove()
 
-  var node = nodeg.selectAll('*').data(nodes)
-  node.enter().append('circle')
-    .attr('r', 5)
+  var node = nodeg.selectAll('g').data(nodes)
+  var g = node.enter().append('g')
     .attr('id', function (node) {
       return node.name
     })
@@ -195,21 +195,17 @@ function update () {
       set_hover()
     })
     .call(force.drag)
+  g.append('circle').attr('r', 5)
+  g.append('circle').attr('r', 4)
+
   node
-    .attr('fill', function (node) {
-      if (node.info) {
-        var last_ssh_exit_code = node.info.last_ssh_exit_code
-        if (!isNaN(last_ssh_exit_code) && last_ssh_exit_code !== 0) {
-          if (node.info.services) {
-            return '#f84' // warn
-          } else {
-            return '#f44' // bad
-          }
-        } else {
-          return '#4f4' // good
-        }
-      }
-    })
+    .classed('supernode', is_supernode)
+    .classed('disconnected', is_disconnected)
+    .classed('endangered', is_endangered)
+    .classed('info-warn', is_info_warn)
+    .classed('info-bad', is_info_bad)
+    .classed('info-good', is_info_good)
+
   node.exit().remove()
 
   var text = textg.selectAll('*').data(nodes)
@@ -247,7 +243,7 @@ function tick () {
              //C x1 y1, x2 y2, x y
     })
 
-  var node = nodeg.selectAll('*').data(nodes)
+  var node = nodeg.selectAll('g').data(nodes)
   node
     .attr('transform', function (d) {
       return 'translate(' + [d.x,d.y] + ')'
@@ -279,6 +275,31 @@ function find_edge (source, target) {
   }
 }
 
+function is_supernode (node) {
+  return node.config && Object.keys(node.config.addresses).length > 0
+}
+function is_disconnected (node) {
+  return node.weight === 0
+}
+function is_endangered (node) {
+  return node.weight > 0 && node.weight <= 2
+}
+function is_info_good (node) {
+  return node.info
+      && isNaN(node.info.last_ssh_exit_code)
+      // TODO currently not set when isNaN: node.info.last_ssh_exit_code===0
+}
+function is_info_bad (node) {
+  return node.info
+      && !node.info.services
+}
+function is_info_warn (node) {
+  return node.info
+      && node.info.services
+      && !isNaN(node.info.last_ssh_exit_code)
+      && node.info.last_ssh_exit_code !== 0
+}
+
 function SNAPSHOT (param) {
   Object.keys(param.subnets).forEach(function (owner) {
     var subnets = param.subnets[owner]
@@ -296,6 +317,10 @@ function SNAPSHOT (param) {
   Object.keys(param.services).forEach(function (hostname) {
     set_info(param.services[hostname])
   })
+  Object.keys(param.config).forEach(function (hostname) {
+    set_config(param.config[hostname])
+  })
+
   update_info()
 }
 
@@ -308,6 +333,10 @@ function ADD_SUBNET (param) {
     var info = info_cache[hostname]
     if (info) {
       node.info = info
+    }
+    var config = config_cache[hostname]
+    if (config) {
+      node.config = config
     }
 
     nodes.push(node)
@@ -405,6 +434,18 @@ function set_info (info) {
   var node = find_node(hostname)
   if (node) {
     node.info = info
+    update()
+  }
+}
+
+var config_cache = {}
+function set_config (param) {
+  var hostname = param.hostname
+  config_cache[hostname] = param.config
+
+  var node = find_node(hostname)
+  if (node) {
+    node.config = param.config
     update()
   }
 }

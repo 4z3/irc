@@ -43,6 +43,7 @@ exports.init = function (events, state) {
         subnets: state.tincd.subnets,
         edges: state.tincd.edges,
         services: state.services,
+        config: state.tinc_config.hosts,
       })
     })
   }
@@ -72,6 +73,16 @@ exports.init = function (events, state) {
   })
 
   events.on('services', broadcast.bind({}, 'services'))
+
+  events.on('host-load', function (hostname, config) {
+    broadcast('config', { hostname: hostname, config: config })
+  })
+  events.on('host-reload', function (hostname, config) {
+    broadcast('config', { hostname: hostname, config: config })
+  })
+  events.on('host-unload', function (hostname) {
+    broadcast('config', { hostname: hostname, config: {} })
+  })
 
   events.on('http-upgrade/websocket', function (uri, take) {
     // TODO w/o headers.origin should not be interpreted as coming from

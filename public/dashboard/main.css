@@ -14,15 +14,40 @@ svg {
   stroke-opacity: 1.0;
 }
 .node circle {
-  r: 5;
+}
+.node circle:nth-child(2) {
+  stroke-width: 1.1px;
+  fill-opacity: 0;
 }
 
-.node .focus {
+.node .focus circle:nth-child(1) {
   stroke: #ff8;
 }
-
-.node :hover {
+.node :hover circle:nth-child(1) {
   stroke: #ff4;
+}
+
+.supernode circle:nth-child(1) {
+  fill: #63b8ff;
+}
+.endangered circle:nth-child(1) {
+  fill: #f00;
+}
+.disconnected circle:nth-child(1) {
+  fill: #222;
+}
+
+circle:nth-child(2) {
+  stroke: #444;
+}
+.info-good circle:nth-child(2) {
+  stroke: #4f4;
+}
+.info-warn circle:nth-child(2) {
+  stroke: #f84;
+}
+.info-bad circle:nth-child(2) {
+  stroke: #f44;
 }
 
 .edge {
