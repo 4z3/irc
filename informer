@@ -1,4 +1,4 @@
-#! /bin/dash
+#! /bin/sh
 {
   echo -n '{' 
   #[ x = "x${NETNAME-}"       ]||echo -n "\"NETNAME\":\"$NETNAME\","
