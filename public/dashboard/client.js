@@ -157,17 +157,21 @@ function update () {
       .size([ w, h ])
   }
 
-  //var edge = edgeg.selectAll('*').data(edges)
-  //edge.enter().append('line')
-  //  .style('stroke-width', function(d) {
-  //    return Math.sqrt(edge.weight)
-  //  })
-  //edge.exit().remove()
+  update_edges()
+  update_nodes()
+  update_labels()
 
-  var path = edgeg.selectAll('*').data(edges)
-  path.enter().append('path')
-    .attr('class', function (d) { return 'link ' + d.type })
-    .attr('marker-end', function (d) { return 'url(#' + d.type + ')' })
+  force.start()
+}
+
+function update_edges () {
+  var sel = edgeg.selectAll('*').data(edges)
+  edge_enter(sel.enter())
+  edge_update(sel)
+  edge_exit(sel.exit())
+}
+function edge_enter (sel) {
+  sel.append('path')
     .on('click', function (edge) {
       set_focus(edge, this)
     })
@@ -177,15 +181,40 @@ function update () {
     .on('mouseout', function () {
       set_hover()
     })
-  path.exit().remove()
-
-  var node = nodeg.selectAll('g').data(nodes)
-  var g = node.enter().append('g')
+}
+function edge_update (sel) {
+  sel
+    .style('stroke', function (edge) {
+      var c,r,g,b
+      c = edge.weight / max_weight()
+      if (c > .6) {
+        r = 10 + 245 * c | 0
+        g = 10 + 245 * (1-c) | 0
+        b = 10 + 245 * (1-c) | 0
+      } else {
+        r = 10 + 245 * c | 0
+        g = 10 + 245 * c | 0
+        b = 10 + 245 * c | 0
+      }
+      return 'rgb(' + [r,g,b] + ')'
+    })
+}
+function edge_exit(sel) {
+  sel.remove()
+}
+
+function update_nodes () {
+  var sel = nodeg.selectAll('g').data(nodes)
+  node_enter(sel.enter())
+  node_update(sel)
+  node_exit(sel.exit())
+}
+function node_enter (sel) {
+  var g = sel.append('g')
     .attr('id', function (node) {
       return node.name
     })
     .on('click', function (node) {
-      // TODO clean any old focus
       set_focus(node, this)
     })
     .on('mouseover', function (node) {
@@ -197,26 +226,37 @@ function update () {
     .call(force.drag)
   g.append('circle').attr('r', 5)
   g.append('circle').attr('r', 4)
-
-  node
+}
+function node_update (sel) {
+  sel
     .classed('supernode', is_supernode)
     .classed('disconnected', is_disconnected)
     .classed('endangered', is_endangered)
     .classed('info-warn', is_info_warn)
     .classed('info-bad', is_info_bad)
     .classed('info-good', is_info_good)
-
-  node.exit().remove()
-
-  var text = textg.selectAll('*').data(nodes)
-  text.enter().append('text')
-  text
+}
+function node_exit (sel) {
+  sel.remove()
+}
+
+function update_labels () {
+  var sel = textg.selectAll('*').data(nodes)
+  label_enter(sel.enter())
+  label_update(sel)
+  label_exit(sel.exit())
+}
+function label_enter (sel) {
+  sel.append('text')
+}
+function label_update (sel) {
+  sel
     .text(function (node) {
       return node.name
     })
-  text.exit().remove()
-
-  force.start()
+}
+function label_exit (sel) {
+  sel.remove()
 }
 
 function tick () {
