@@ -260,12 +260,11 @@ function update_label (sel) {
 }
 function label_enter (sel) {
   sel.append('text')
-}
-function label_update (sel) {
-  sel
     .text(function (node) {
       return node.name
     })
+}
+function label_update (sel) {
 }
 function label_exit (sel) {
   sel.remove()
