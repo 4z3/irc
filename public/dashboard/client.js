@@ -78,7 +78,6 @@ window.onload = function () {
     })
 
   svg = d3.select('#graph').append('svg')
-    //.attr('pointer-events', 'all')
     .on('click', clear_focus)
     .call(d3.behavior.zoom().scaleExtent([.1, 23]).on('zoom', function () {
       trans = d3.event.translate
