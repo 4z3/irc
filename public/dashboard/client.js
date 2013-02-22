@@ -82,7 +82,7 @@ window.onload = function () {
     .on('click', function (d) {
       set_focus()
     })
-    .call(d3.behavior.zoom().scaleExtent([.1, 10]).on('zoom', function () {
+    .call(d3.behavior.zoom().scaleExtent([.1, 23]).on('zoom', function () {
       trans = d3.event.translate
       scale = d3.event.scale
       graphg.attr('transform', 'translate(' + trans + ')scale(' + scale + ')')
