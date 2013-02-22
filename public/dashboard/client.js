@@ -91,14 +91,14 @@ window.onload = function () {
   nodeg = graphg.append('g').attr('class', 'node')
   textg = graphg.append('g').attr('class', 'text')
 
-  update()
   force.start()
+  update()
 }
 
 window.onresize = function (event) {
   // TODO throttle
-  update()
   force.start()
+  update()
 }
 
 var is_focus, get_focus, set_focus, clear_focus
@@ -365,8 +365,8 @@ function ADD_SUBNET (param) {
   // update node
   node.subnets[param.subnet] = param.weight
 
-  update()
   force.start()
+  update()
 }
 function DEL_SUBNET (param) {
   var node = find_node(param.owner)
@@ -374,8 +374,8 @@ function DEL_SUBNET (param) {
   if (Object.keys(node.subnets).length === 0) {
     delete_node(node)
   }
-  update()
   force.start()
+  update()
 }
 
 // buffer for edges with missing nodes
@@ -415,8 +415,8 @@ function ADD_EDGE (param) {
   edge.weight = param.weight
 
   // TODO only update if something has changed(?)
-  update()
   force.start()
+  update()
 }
 function DEL_EDGE (param) {
   for (var i = edges.length - 1; i >= 0; i--) {
@@ -426,8 +426,8 @@ function DEL_EDGE (param) {
       var edge = edges.splice(i, 1)[0]
     }
   }
-  update()
   force.start()
+  update()
 }
 
 function unlink_node (node) {
