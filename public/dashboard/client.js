@@ -215,9 +215,9 @@ function tick_edge (sel) {
       var sx = source.x, sy = source.y
       var tx = target.x, ty = target.y
 
-      var dx = tx - sx,
-          dy = ty - sy,
-          dr = Math.sqrt(dx * dx + dy * dy);
+      var dx = tx - sx
+      var dy = ty - sy
+      var dr = Math.sqrt(dx * dx + dy * dy)
 
       var ox = sx + dx + (sy - ty) / 64
       var oy = sy + dy + (tx - sx) / 64
