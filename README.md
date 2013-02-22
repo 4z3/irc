@@ -60,6 +60,7 @@
     git remote add -f github https://github.com/krebscode/painload
     git config core.sparsecheckout true
     echo retiolum/hosts > .git/info/sparse-checkout
+    git pull github master
     cd ..
 
   if there is already an `etc/hosts` directory, remove it
