@@ -92,11 +92,13 @@ window.onload = function () {
   textg = graphg.append('g').attr('class', 'text')
 
   update()
+  force.start()
 }
 
 window.onresize = function (event) {
   // TODO throttle
   update()
+  force.start()
 }
 
 var is_focus, get_focus, set_focus, clear_focus
@@ -155,18 +157,9 @@ function update () {
       .size([ w, h ])
   }
 
-  var edge = edgeg.selectAll('*').data(edges)
-  var node = nodeg.selectAll('g').data(nodes)
-  var label = textg.selectAll('*').data(nodes)
-
-  update_edge(edge)
-  update_node(node)
-  update_label(label)
-
-  if (!edge.enter().empty() || !edge.exit().empty() ||
-      !node.enter().empty() || !node.exit().empty()) {
-    force.start()
-  }
+  update_edge(edgeg.selectAll('*').data(edges))
+  update_node(nodeg.selectAll('g').data(nodes))
+  update_label(textg.selectAll('*').data(nodes))
 
   update_info()
 }
@@ -373,6 +366,7 @@ function ADD_SUBNET (param) {
   node.subnets[param.subnet] = param.weight
 
   update()
+  force.start()
 }
 function DEL_SUBNET (param) {
   var node = find_node(param.owner)
@@ -381,6 +375,7 @@ function DEL_SUBNET (param) {
     delete_node(node)
   }
   update()
+  force.start()
 }
 
 // buffer for edges with missing nodes
@@ -421,6 +416,7 @@ function ADD_EDGE (param) {
 
   // TODO only update if something has changed(?)
   update()
+  force.start()
 }
 function DEL_EDGE (param) {
   for (var i = edges.length - 1; i >= 0; i--) {
@@ -431,6 +427,7 @@ function DEL_EDGE (param) {
     }
   }
   update()
+  force.start()
 }
 
 function unlink_node (node) {
