@@ -92,7 +92,6 @@ window.onload = function () {
   textg = graphg.append('g').attr('class', 'text')
 
   update()
-  update_info()
 }
 
 window.onresize = function (event) {
@@ -115,12 +114,10 @@ var is_focus, get_focus, set_focus, clear_focus
     }
     d3.event.stopPropagation()
     update()
-    update_info()
   }
   clear_focus = function () {
     focus = null
     update()
-    update_info()
   }
 })()
 var get_hover, set_hover, clear_hover
@@ -133,11 +130,11 @@ var get_hover, set_hover, clear_hover
       node: node,
       that: this,
     }
-    update_info()
+    update()
   }
   clear_hover = function () {
     hover = null
-    update_info()
+    update()
   }
 })()
 
@@ -170,6 +167,8 @@ function update () {
       !node.enter().empty() || !node.exit().empty()) {
     force.start()
   }
+
+  update_info()
 }
 
 function update_edge (sel) {
@@ -348,8 +347,6 @@ function SNAPSHOT (param) {
   Object.keys(param.config).forEach(function (hostname) {
     set_config(param.config[hostname])
   })
-
-  update_info()
 }
 
 function ADD_SUBNET (param) {
@@ -375,7 +372,6 @@ function ADD_SUBNET (param) {
   node.subnets[param.subnet] = param.weight
 
   update()
-  update_info()
 }
 function DEL_SUBNET (param) {
   var node = find_node(param.owner)
@@ -384,7 +380,6 @@ function DEL_SUBNET (param) {
     delete_node(node)
   }
   update()
-  update_info()
 }
 
 // buffer for edges with missing nodes
@@ -425,7 +420,6 @@ function ADD_EDGE (param) {
 
   // TODO only update if something has changed(?)
   update()
-  update_info()
 }
 function DEL_EDGE (param) {
   for (var i = edges.length - 1; i >= 0; i--) {
@@ -436,7 +430,6 @@ function DEL_EDGE (param) {
     }
   }
   update()
-  update_info()
 }
 
 function unlink_node (node) {
