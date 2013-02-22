@@ -145,6 +145,11 @@ var set_hover, get_hover
   }
 })()
 
+function tick () {
+  tick_edge(edgeg.selectAll('*').data(edges))
+  tick_node(nodeg.selectAll('g').data(nodes))
+  tick_label(textg.selectAll('*').data(nodes))
+}
 function update () {
   if (w !== window.innerWidth || h !== window.innerHeight) {
 
@@ -202,6 +207,25 @@ function edge_update (sel) {
 function edge_exit(sel) {
   sel.remove()
 }
+function tick_edge (sel) {
+  sel
+    .attr('d', function(edge) {
+      var source = edge.source
+      var target = edge.target
+
+      var sx = source.x, sy = source.y
+      var tx = target.x, ty = target.y
+
+      var dx = tx - sx,
+          dy = ty - sy,
+          dr = Math.sqrt(dx * dx + dy * dy);
+
+      var ox = sx + dx + (sy - ty) / 64
+      var oy = sy + dy + (tx - sx) / 64
+
+      return 'M' + sx + ',' + sy + 'Q' + ox + ' ' + oy + ',' + tx + ' ' + ty
+    })
+}
 
 function update_nodes () {
   var sel = nodeg.selectAll('g').data(nodes)
@@ -239,6 +263,12 @@ function node_update (sel) {
 function node_exit (sel) {
   sel.remove()
 }
+function tick_node (sel) {
+  sel
+    .attr('transform', function (node) {
+      return 'translate(' + [ node.x, node.y ] + ')'
+    })
+}
 
 function update_labels () {
   var sel = textg.selectAll('*').data(nodes)
@@ -258,41 +288,10 @@ function label_update (sel) {
 function label_exit (sel) {
   sel.remove()
 }
-
-function tick () {
-  //var edge = edgeg.selectAll('*').data(edges)
-  //edge
-  //  .attr('x1', function(d) { return d.source.x })
-  //  .attr('y1', function(d) { return d.source.y })
-  //  .attr('x2', function(d) { return d.target.x })
-  //  .attr('y2', function(d) { return d.target.y })
-
-  var path = edgeg.selectAll('*').data(edges)
-  path
-    .attr('d', function(d) {
-      var dx = d.target.x - d.source.x,
-          dy = d.target.y - d.source.y,
-          dr = Math.sqrt(dx * dx + dy * dy);
-
-      var ox = d.source.x + dx + (d.source.y - d.target.y) / 64
-      var oy = d.source.y + dy + (d.target.x - d.source.x) / 64
-
-      return 'M' + d.source.x + ',' + d.source.y +
-             //'A' + dr + ',' + dr + ' 0 0,1 ' + d.target.x + ',' + d.target.y
-             'Q' + ox + ' ' + oy + ',' + d.target.x + ' ' + d.target.y
-             //C x1 y1, x2 y2, x y
-    })
-
-  var node = nodeg.selectAll('g').data(nodes)
-  node
-    .attr('transform', function (d) {
-      return 'translate(' + [d.x,d.y] + ')'
-    })
-
-  var text = textg.selectAll('*').data(nodes)
-  text
-    .attr('transform', function (d) {
-      return 'translate(' + [d.x,d.y] + ')'
+function tick_label (sel) {
+  sel
+    .attr('transform', function (node) {
+      return 'translate(' + [ node.x, node.y ] + ')'
     })
 }
 
