@@ -79,9 +79,7 @@ window.onload = function () {
 
   svg = d3.select('#graph').append('svg')
     //.attr('pointer-events', 'all')
-    .on('click', function (d) {
-      set_focus()
-    })
+    .on('click', clear_focus)
     .call(d3.behavior.zoom().scaleExtent([.1, 23]).on('zoom', function () {
       trans = d3.event.translate
       scale = d3.event.scale
@@ -103,44 +101,43 @@ window.onresize = function (event) {
   update()
 }
 
-var set_focus, get_focus
+var is_focus, get_focus, set_focus, clear_focus
 ;(function (focus) {
+  is_focus = function (x) {
+    return focus && focus.node === x
+  }
   get_focus = function () {
     return focus
   }
-  set_focus = function (node, that) {
-    // clear
-    if (focus) {
-      d3.select(focus.that).classed('focus', false)
-      focus = null
+  set_focus = function (node) {
+    focus = {
+      node: node,
+      that: this,
     }
-    if (node && that) {
-      focus = {
-        node: node,
-        that: that,
-      }
-      d3.select(focus.that).classed('focus', true)
-    }
-    update_info()
     d3.event.stopPropagation()
+    update()
+    update_info()
+  }
+  clear_focus = function () {
+    focus = null
+    update()
+    update_info()
   }
 })()
-var set_hover, get_hover
+var get_hover, set_hover, clear_hover
 ;(function (hover) {
   get_hover = function () {
     return hover
   }
-  set_hover = function (node, that) {
-    // clear
-    if (hover) {
-      hover = null
+  set_hover = function (node) {
+    hover = {
+      node: node,
+      that: this,
     }
-    if (node && that) {
-      hover = {
-        node: node,
-        that: this,
-      }
-    }
+    update_info()
+  }
+  clear_hover = function () {
+    hover = null
     update_info()
   }
 })()
@@ -176,15 +173,9 @@ function update_edge (sel) {
 }
 function edge_enter (sel) {
   sel.append('path')
-    .on('click', function (edge) {
-      set_focus(edge, this)
-    })
-    .on('mouseover', function (edge) {
-      set_hover(edge, this)
-    })
-    .on('mouseout', function () {
-      set_hover()
-    })
+    .on('click', set_focus)
+    .on('mouseover', set_hover)
+    .on('mouseout', clear_hover)
 }
 function edge_update (sel) {
   sel
@@ -236,15 +227,9 @@ function node_enter (sel) {
     .attr('id', function (node) {
       return node.name
     })
-    .on('click', function (node) {
-      set_focus(node, this)
-    })
-    .on('mouseover', function (node) {
-      set_hover(node, this)
-    })
-    .on('mouseout', function (node) {
-      set_hover()
-    })
+    .on('click', set_focus)
+    .on('mouseover', set_hover)
+    .on('mouseout', clear_hover)
     .call(force.drag)
   g.append('circle').attr('r', 5)
   g.append('circle').attr('r', 4)
@@ -257,6 +242,7 @@ function node_update (sel) {
     .classed('info-warn', is_info_warn)
     .classed('info-bad', is_info_bad)
     .classed('info-good', is_info_good)
+    .classed('focus', is_focus)
 }
 function node_exit (sel) {
   sel.remove()
