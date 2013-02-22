@@ -62,6 +62,10 @@ var events = new EventEmitter()
 events.on('info', log.info)
 events.on('error', log.error)
 
+function log_blacklist (e, x) {
+  return false
+}
+
 events.onAny(function () {
   if (!events._events.hasOwnProperty(this.event)) {
     var args = inspect(arguments)
