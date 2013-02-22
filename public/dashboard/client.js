@@ -162,15 +162,14 @@ function update () {
       .size([ w, h ])
   }
 
-  update_edges()
-  update_nodes()
-  update_labels()
+  update_edge(edgeg.selectAll('*').data(edges))
+  update_node(nodeg.selectAll('g').data(nodes))
+  update_label(textg.selectAll('*').data(nodes))
 
   force.start()
 }
 
-function update_edges () {
-  var sel = edgeg.selectAll('*').data(edges)
+function update_edge (sel) {
   edge_enter(sel.enter())
   edge_update(sel)
   edge_exit(sel.exit())
@@ -227,8 +226,7 @@ function tick_edge (sel) {
     })
 }
 
-function update_nodes () {
-  var sel = nodeg.selectAll('g').data(nodes)
+function update_node (sel) {
   node_enter(sel.enter())
   node_update(sel)
   node_exit(sel.exit())
@@ -270,8 +268,7 @@ function tick_node (sel) {
     })
 }
 
-function update_labels () {
-  var sel = textg.selectAll('*').data(nodes)
+function update_label (sel) {
   label_enter(sel.enter())
   label_update(sel)
   label_exit(sel.exit())
