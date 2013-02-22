@@ -19,6 +19,9 @@ state.config.informer = {
 state.config.tinc_config = {
   uri: process.env.conf_dir || 'etc'
 }
+state.config.github_post_receive = {
+  working_directory: 'src',
+}
 state.config.services = {
   bootstrap_file: '/krebs/services/etc/services/bootstrap',
   identity_file: process.env.identity_file || 'etc/id_rsa',

@@ -84,7 +84,10 @@ exports.init = function (events, state) {
   // TODO merge with ip_setup's ip
   function git (args) {
     var command = 'git'
-    var options = { cwd: 'src', env: {} } // TODO configurable cwd
+    var options = {
+      cwd: state.config.github_post_receive.working_directory,
+      env: {},
+    }
     var child = spawn(command, args, options)
 
     child.stdout.on('data', make_data_to_lines(child.stdout))
