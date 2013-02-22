@@ -158,11 +158,18 @@ function update () {
       .size([ w, h ])
   }
 
-  update_edge(edgeg.selectAll('*').data(edges))
-  update_node(nodeg.selectAll('g').data(nodes))
-  update_label(textg.selectAll('*').data(nodes))
+  var edge = edgeg.selectAll('*').data(edges)
+  var node = nodeg.selectAll('g').data(nodes)
+  var label = textg.selectAll('*').data(nodes)
 
-  force.start()
+  update_edge(edge)
+  update_node(node)
+  update_label(label)
+
+  if (!edge.enter().empty() || !edge.exit().empty() ||
+      !node.enter().empty() || !node.exit().empty()) {
+    force.start()
+  }
 }
 
 function update_edge (sel) {
